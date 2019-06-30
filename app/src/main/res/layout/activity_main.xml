@@ -5,140 +5,169 @@
     android:background="@color/colorBackground"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/shape_block_selected_stroke"
-        android:orientation="horizontal">
-
-        <GridView
-            android:id="@+id/gv_tetris"
-            android:layout_width="240dp"
-            android:layout_height="432dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/shape_block_selected_stroke"
-            android:horizontalSpacing="0dp"
-            android:numColumns="10"
-            android:verticalSpacing="0dp" />
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="得分："
-                android:textColor="@color/colorBlack" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_margin="10dp">
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:hint="8888888"
-                    android:textColor="@color/colorBlack"
-                    android:textColorHint="@color/colorGray"
-                    android:textSize="18sp" />
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:id="@+id/tv_score"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="18sp" />
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="级别："
-                android:textColor="@color/colorBlack" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_margin="10dp">
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:hint="8"
-                    android:textColor="@color/colorBlack"
-                    android:textColorHint="@color/colorGray"
-                    android:textSize="18sp" />
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:id="@+id/tv_level"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="18sp" />
-            </RelativeLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="最高分："
-                android:textColor="@color/colorBlack" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_margin="10dp">
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:hint="8888888"
-                    android:textColor="@color/colorBlack"
-                    android:textColorHint="@color/colorGray"
-                    android:textSize="18sp" />
-
-                <cn.xydzjnq.tetris.view.LedTextView
-                    android:id="@+id/tv_max_score"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:gravity="right"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="18sp" />
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/tv_next_tetris"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="下一个："
-                android:textColor="@color/colorBlack" />
+            android:background="@drawable/shape_block_selected_stroke"
+            android:orientation="horizontal">
 
             <GridView
-                android:id="@+id/gv_next_tetris"
-                android:layout_width="96dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="10dp"
-                android:numColumns="4" />
+                android:id="@+id/gv_tetris"
+                android:layout_width="240dp"
+                android:layout_height="432dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/shape_block_selected_stroke"
+                android:horizontalSpacing="0dp"
+                android:numColumns="10"
+                android:verticalSpacing="0dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="得分："
+                    android:textColor="@color/colorBlack" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_margin="10dp">
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:hint="8888888"
+                        android:textColor="@color/colorBlack"
+                        android:textColorHint="@color/colorGray"
+                        android:textSize="18sp" />
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:id="@+id/tv_score"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="级别："
+                    android:textColor="@color/colorBlack" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_margin="10dp">
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:hint="8"
+                        android:textColor="@color/colorBlack"
+                        android:textColorHint="@color/colorGray"
+                        android:textSize="18sp" />
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:id="@+id/tv_level"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="最高分："
+                    android:textColor="@color/colorBlack" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_margin="10dp">
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:hint="8888888"
+                        android:textColor="@color/colorBlack"
+                        android:textColorHint="@color/colorGray"
+                        android:textSize="18sp" />
+
+                    <cn.xydzjnq.tetris.view.LedTextView
+                        android:id="@+id/tv_max_score"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:gravity="right"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="18sp" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_next_tetris"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="下一个："
+                    android:textColor="@color/colorBlack" />
+
+                <GridView
+                    android:id="@+id/gv_next_tetris"
+                    android:layout_width="96dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:numColumns="4" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_anim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="75dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_anim"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/anim_wait" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="俄罗斯方块"
+                android:textColor="@color/colorBlack"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
