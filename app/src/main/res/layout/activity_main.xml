@@ -16,7 +16,7 @@
             android:orientation="horizontal">
 
             <GridView
-                android:id="@+id/gv_tetris"
+                android:id="@+id/gv_block_board"
                 android:layout_width="240dp"
                 android:layout_height="432dp"
                 android:layout_margin="8dp"
@@ -128,14 +128,13 @@
                 </RelativeLayout>
 
                 <TextView
-                    android:id="@+id/tv_next_tetris"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="下一个："
                     android:textColor="@color/colorBlack" />
 
                 <GridView
-                    android:id="@+id/gv_next_tetris"
+                    android:id="@+id/gv_next_piece"
                     android:layout_width="96dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center_horizontal"

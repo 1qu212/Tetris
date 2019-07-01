@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -35,15 +34,11 @@ import static cn.xydzjnq.tetris.Constant.RECORDLIST;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static String TAG = "MainActivity";
-    private GridView gvTetris;
+    private GridView gvBlockBoard;
     private LedTextView tvScore;
     private LedTextView tvLevel;
     private LedTextView tvMaxScore;
-    /**
-     * 下一个：
-     */
-    private TextView tvNextTetris;
-    private GridView gvNextTetris;
+    private GridView gvNextPiece;
     private Button btnPause;
     private Button btnRecordList;
     private Button btnRestart;
@@ -55,143 +50,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Piece currentPiece;
     private ImageView ivAnim;
     private LinearLayout llAnim;
+    //方块片左下角在整个界面的行和列
     private int row;
     private int culumn;
+    //界面的行数和列数
+    private final static int BOARDROW = 18;
+    private final static int BOARDCULUMN = 10;
+    //方块片的行数和列数
+    private final static int PIECEROW = 4;
+    private final static int PIECECULUMN = 4;
     private Piece nextPiece;
-    private int[] currentArrays;
-    private int[] nextArrays;
-    private int[] previousAllArrays;
-    private int[] allArrays;
-    private BlockAdapter nextAdapter;
-    private BlockAdapter blockAdapter;
-    private static int REFRESH_BLOCKS = 0;
-    private static int REFRESH_NEXT_BLOCKS = 1;
-    private static int INIT_DATA = 2;
-    private static int INSTANT_REFRESH_BLOCKS = 3;
-    private static int UP = 4;
-    private static int LEFT = 5;
-    private static int RIGHT = 6;
-    private static int DOWN = 7;
-    private static int PAUSE = 8;
-    private static int RESUME = 9;
-    private static int REFRESH_SCORE = 10;
-    private static int GAME_OVER = 11;
-    private boolean isInitial = true;
-
-    private Timer timer;
+    //界面中的方块片数组
+    private int[] currentPieceArray;
+    //“下一个”方块片数组
+    private int[] nextPieceArray;
+    //已经确定的（不含空中方块片）的界面数组
+    private int[] blockBoardArray;
+    //用于更新界面的数组（可含空中方块片，也可不含空中方块片）
+    private int[] tempBlockBoardArray;
+    private BlockAdapter nextPieceAdapter;
+    private BlockAdapter blockBoardAdapter;
+    //非正在重玩状态
+    private boolean isStart = true;
+    //方块片下落定时器
+    private Timer downTimer;
+    //方块片快速下落定时器
     private Timer spaceTimer;
+    //下落的时间间隔
     private int timeInterval = 600;
+    //等级
     private int level = 1;
+    //分数
     private int score = 0;
+    //同一次消除方块片，每一行所获得的分数
     private int scoreStep = 100;
     private HandlerThread handlerThread;
-
     private Handler handler;
+    private final static int DOWN_TIMER_RUN = 0;
+    private final static int RESTART = 1;
+    private final static int UP = 2;
+    private final static int LEFT = 3;
+    private final static int RIGHT = 4;
+    private final static int DOWN = 5;
     private AnimationDrawable animationDrawable;
-
-    private Handler uiHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    blockAdapter.setColors(allArrays);
-                    break;
-                case 1:
-                    nextAdapter.setColors(nextArrays);
-                    break;
-                case 8:
-                    btnSpace.setEnabled(false);
-                    btnRecordList.setEnabled(false);
-                    btnUp.setEnabled(false);
-                    btnLeft.setEnabled(false);
-                    btnRight.setEnabled(false);
-                    btnDown.setEnabled(false);
-                    break;
-                case 9:
-                    btnSpace.setEnabled(true);
-                    btnRecordList.setEnabled(true);
-                    btnUp.setEnabled(true);
-                    btnLeft.setEnabled(true);
-                    btnRight.setEnabled(true);
-                    btnDown.setEnabled(true);
-                    break;
-                case 10:
-                    tvScore.setText(String.valueOf(score));
-                    if (score <= 1000) {
-                        level = 1;
-                        timeInterval = 600;
-                    } else if (score <= 2000) {
-                        level = 2;
-                        timeInterval = 550;
-                    } else if (score <= 5000) {
-                        level = 3;
-                        timeInterval = 500;
-                    } else if (score <= 10000) {
-                        level = 4;
-                        timeInterval = 450;
-                    } else {
-                        level = 5;
-                        timeInterval = 400;
-                    }
-                    tvLevel.setText(String.valueOf(level));
-                    break;
-                case 11:
-                    if (!animationDrawable.isRunning()) {
-                        if (spaceTimer != null) {
-                            spaceTimer.cancel();
-                            spaceTimer = null;
-                        }
-                        if (timer != null) {
-                            timer.cancel();
-                            timer = null;
-                        }
-                        llAnim.setVisibility(View.VISIBLE);
-                        animationDrawable.start();
-                        SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
-                        String recordList = sharedPreferences.getString(RECORDLIST, "");
-                        if (!recordList.isEmpty()) {
-                            Gson gson = new Gson();
-                            RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
-                            List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
-                            int size = recordBeanList.size();
-                            RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
-                            Integer lastScore = Integer.parseInt(recordBean.getScore());
-                            if (score >= lastScore) {
-                                RecordListBean listBean = new RecordListBean();
-                                List<RecordListBean.RecordBean> beanList = new ArrayList<>();
-                                beanList.addAll(recordBeanList);
-                                RecordListBean.RecordBean bean = new RecordListBean.RecordBean();
-                                bean.setName("匿名");
-                                bean.setScore(String.valueOf(score));
-                                bean.setTime(String.valueOf(System.currentTimeMillis()));
-                                beanList.add(bean);
-                                listBean.setRecordBeanList(beanList);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(RECORDLIST, new Gson().toJson(listBean));
-                                editor.commit();
-                            }
-                        } else {
-                            if (score > 0) {
-                                RecordListBean recordListBean = new RecordListBean();
-                                RecordListBean.RecordBean recordBean = new RecordListBean.RecordBean();
-                                recordBean.setName("匿名");
-                                recordBean.setScore(String.valueOf(score));
-                                recordBean.setTime(String.valueOf(System.currentTimeMillis()));
-                                List<RecordListBean.RecordBean> recordBeanList = new ArrayList<>();
-                                recordBeanList.add(recordBean);
-                                recordListBean.setRecordBeanList(recordBeanList);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(RECORDLIST, new Gson().toJson(recordListBean));
-                                editor.commit();
-                            }
-                        }
-                        score = 0;
-                    }
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,16 +104,105 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         handlerThread = new HandlerThread(UUID.randomUUID().toString(), -2);
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case DOWN_TIMER_RUN:
+                        if (isCollision()) {
+                            row--;
+                            touchBottom();
+                        } else {
+                            setTempBlockBoardArray();
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        break;
+                    case RESTART:
+                        isStart = false;
+                        cancelDownTimer();
+                        cancelSpaceTimer();
+                        for (int i = BOARDROW; i > 0; i--) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            for (int j = 1; j <= BOARDCULUMN; j++) {
+                                tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] = 1;
+                            }
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        for (int i = 1; i <= BOARDROW; i++) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            for (int j = 1; j <= BOARDCULUMN; j++) {
+                                tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] = 0;
+                            }
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
+                        isStart = true;
+                        uiHandler.sendEmptyMessage(RESET_DATA);
+                        break;
+                    case UP:
+                        currentPieceArray = currentPiece.nextStatePieceArray();
+                        if (isCollision()) {
+                            currentPieceArray = currentPiece.previousStatePieceArray();
+                        } else {
+                            setTempBlockBoardArray();
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        break;
+                    case LEFT:
+                        culumn--;
+                        if (isCollision()) {
+                            culumn++;
+                        } else {
+                            setTempBlockBoardArray();
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        break;
+                    case RIGHT:
+                        culumn++;
+                        if (isCollision()) {
+                            culumn--;
+                        } else {
+                            setTempBlockBoardArray();
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        break;
+                    case DOWN:
+                        row++;
+                        if (isCollision()) {
+                            row--;
+                            touchBottom();
+                        } else {
+                            setTempBlockBoardArray();
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+                        }
+                        break;
+                }
+            }
+
+            /**
+             *
+             * @return 下落或者左移右移旋转中的方块片是否与界面已有方块冲突
+             */
             private boolean isCollision() {
-                allArrays = Arrays.copyOf(previousAllArrays, 180);
+                tempBlockBoardArray = Arrays.copyOf(blockBoardArray, BOARDROW * BOARDCULUMN);
                 int count = 0;
-                for (int i = row; i > row - 4 && i > 0; i--) {
-                    for (int j = culumn; j < culumn + 4; j++) {
-                        if (i <= 18 && j >= 1 && j <= 10) {
-                            if (currentArrays[(4 - (row - i) - 1) * 4 + (j - culumn)] != 0) {
-                                if (allArrays[(i - 1) * 10 + j - 1] != 0) {
+                for (int i = row; i > row - PIECEROW && i > 0; i--) {
+                    for (int j = culumn; j < culumn + PIECECULUMN; j++) {
+                        if (i <= BOARDROW && j >= 1 && j <= BOARDCULUMN) {
+                            if (currentPieceArray[(PIECEROW - (row - i) - 1) * PIECECULUMN + (j - culumn)] != 0) {
+                                if (tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] != 0) {
                                     if (row <= currentPiece.getInitalRow()) {
                                         uiHandler.sendEmptyMessage(GAME_OVER);
+                                        //这里是为了防止游戏结束还在touchBottom，还在REFRESH_NEXT_PIECE
+                                        return false;
                                     }
                                     return true;
                                 }
@@ -221,80 +211,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-                if (count == 4) {
-                    return false;
-                }
-                if (row < 4) {
+                if (count == PIECEROW) {
                     return false;
                 }
                 return true;
             }
 
-            private void setAllArrays() {
-                allArrays = Arrays.copyOf(previousAllArrays, 180);
-                for (int i = row; i > row - 4 && i > 0; i--) {
-                    for (int j = culumn; j < culumn + 4; j++) {
-                        if (i <= 18 && j >= 1 && j <= 10) {
-                            if (allArrays[(i - 1) * 10 + j - 1] == 0) {
-                                allArrays[(i - 1) * 10 + j - 1] = currentArrays[(4 - (row - i) - 1) * 4 + (j - culumn)];
+            private void setTempBlockBoardArray() {
+                tempBlockBoardArray = Arrays.copyOf(blockBoardArray, BOARDROW * BOARDCULUMN);
+                for (int i = row; i > row - PIECEROW && i > 0; i--) {
+                    for (int j = culumn; j < culumn + PIECECULUMN; j++) {
+                        if (i <= BOARDROW && j >= 1 && j <= BOARDCULUMN) {
+                            if (tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] == 0) {
+                                tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] = currentPieceArray[(PIECEROW - (row - i) - 1) * PIECECULUMN + (j - culumn)];
                             }
                         }
                     }
                 }
             }
 
+            /**
+             * 方块片到界面底部了
+             */
             private void touchBottom() {
-                if (spaceTimer != null) {
-                    spaceTimer.cancel();
-                    spaceTimer = null;
-                }
-                if (timer != null) {
-                    timer.cancel();
-                    timer = null;
-                }
-                row--;
-                setAllArrays();
-                previousAllArrays = Arrays.copyOf(allArrays, 180);
-                blockDispear();
-                uiHandler.sendEmptyMessage(RESUME);
+                uiHandler.sendEmptyMessage(PAUSE);
+                setTempBlockBoardArray();
+                //触底先保存现在的界面状态
+                blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
+                //再消除满行
+                lineDispear();
                 row = currentPiece.getInitalRow();
-                if (!animationDrawable.isRunning() && timer == null) {
-                    timer = new Timer();
-                    timer.schedule(getTimerTask(), timeInterval, timeInterval);
-                }
                 currentPiece = nextPiece;
-                currentArrays = currentPiece.getPieceArray();
+                currentPieceArray = currentPiece.getPieceArray();
                 culumn = currentPiece.getInitalCulumn();
                 nextPiece = PieceFatory.createPiece();
-                nextArrays = nextPiece.getSimplePieceArray();
+                nextPieceArray = nextPiece.getSimplePieceArray();
                 scoreStep = 100;
-                uiHandler.sendEmptyMessage(REFRESH_NEXT_BLOCKS);
+                uiHandler.sendEmptyMessage(REFRESH_NEXT_PIECE);
+                uiHandler.sendEmptyMessage(RESUME);
             }
 
-            private void blockDispear() {
-                if (spaceTimer != null) {
-                    spaceTimer.cancel();
-                    spaceTimer = null;
-                }
-                if (timer != null) {
-                    timer.cancel();
-                    timer = null;
-                }
-                uiHandler.sendEmptyMessage(PAUSE);
-                for (int i = 18; i >= 1; i--) {
+            /**
+             * 消除满行
+             */
+            private void lineDispear() {
+                for (int i = BOARDROW; i >= 1; i--) {
                     int count = 0;
-                    for (int j = 1; j <= 10; j++) {
-                        if (allArrays[(i - 1) * 10 + j - 1] == 1) {
+                    for (int j = 1; j <= BOARDCULUMN; j++) {
+                        if (tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] == 1) {
                             count++;
                         }
                     }
-                    if (count == 10) {
+                    if (count == BOARDCULUMN) {
                         int splashCount = 5;
                         for (int k = 0; k < splashCount; k++) {
-                            for (int j = 1; j <= 10; j++) {
-                                allArrays[(i - 1) * 10 + j - 1] = (k / 2 == 0) ? 0 : 1;
+                            for (int j = 1; j <= BOARDCULUMN; j++) {
+                                tempBlockBoardArray[(i - 1) * BOARDCULUMN + j - 1] = (k / 2 == 0) ? 0 : 1;
                             }
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
+                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
                             try {
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
@@ -302,97 +276,177 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                         for (int x = i; x >= 2; x--) {
-                            for (int j = 1; j <= 10; j++) {
-                                allArrays[(x - 1) * 10 + j - 1] = allArrays[(x - 2) * 10 + j - 1];
+                            for (int j = 1; j <= BOARDCULUMN; j++) {
+                                tempBlockBoardArray[(x - 1) * BOARDCULUMN + j - 1] = tempBlockBoardArray[(x - 2) * BOARDCULUMN + j - 1];
                             }
                         }
-                        for (int x = 0; x < 10; x++) {
-                            allArrays[x] = 0;
+                        for (int x = 0; x < BOARDCULUMN; x++) {
+                            tempBlockBoardArray[x] = 0;
                         }
-                        previousAllArrays = Arrays.copyOf(allArrays, 180);
-                        uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
+                        blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
+                        uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
                         score += scoreStep;
                         scoreStep += 20;
                         uiHandler.sendEmptyMessage(REFRESH_SCORE);
-                        blockDispear();
+                        lineDispear();
                         break;
                     }
-                }
-            }
-
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 0:
-                        uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                        break;
-                    case 2:
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                initData();
-                            }
-                        });
-                        break;
-                    case 3:
-                        if (isCollision()) {
-                            touchBottom();
-                        } else {
-                            setAllArrays();
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                        }
-                        break;
-                    case 4:
-                        currentArrays = currentPiece.nextStatePieceArray();
-                        if (isCollision()) {
-                            currentArrays = currentPiece.previousStatePieceArray();
-                        } else {
-                            setAllArrays();
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                        }
-                        break;
-                    case 5:
-                        culumn--;
-                        if (isCollision()) {
-                            culumn++;
-                        } else {
-                            setAllArrays();
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                        }
-                        break;
-                    case 6:
-                        culumn++;
-                        if (isCollision()) {
-                            culumn--;
-                        } else {
-                            setAllArrays();
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                        }
-                        break;
-                    case 7:
-                        if (!animationDrawable.isRunning()) {
-                            row++;
-                            if (isCollision()) {
-                                touchBottom();
-                            } else {
-                                setAllArrays();
-                                uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-                            }
-                        }
-                        break;
                 }
             }
         };
     }
 
+    private final static int REFRESH_BLOCK_BOARD = 100;
+    private final static int REFRESH_NEXT_PIECE = 101;
+    private final static int PAUSE_RESUME = 102;
+    private final static int PAUSE = 103;
+    private final static int RESUME = 104;
+    private final static int REFRESH_SCORE = 105;
+    private final static int GAME_OVER = 106;
+    private final static int RESET_DATA = 107;
+    private Handler uiHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case REFRESH_BLOCK_BOARD:
+                    blockBoardAdapter.setColors(tempBlockBoardArray);
+                    break;
+                case REFRESH_NEXT_PIECE:
+                    nextPieceAdapter.setColors(nextPieceArray);
+                    break;
+                case PAUSE_RESUME:
+                    if (!animationDrawable.isRunning() && downTimer == null) {
+                        downTimer = new Timer();
+                        downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
+                        btnSpace.setEnabled(true);
+                        btnRecordList.setEnabled(true);
+                        btnUp.setEnabled(true);
+                        btnLeft.setEnabled(true);
+                        btnRight.setEnabled(true);
+                        btnDown.setEnabled(true);
+                    } else {
+                        cancelSpaceTimer();
+                        cancelDownTimer();
+                        downTimer = null;
+                        btnSpace.setEnabled(false);
+                        btnRecordList.setEnabled(false);
+                        btnUp.setEnabled(false);
+                        btnLeft.setEnabled(false);
+                        btnRight.setEnabled(false);
+                        btnDown.setEnabled(false);
+                    }
+                    break;
+                case PAUSE:
+                    cancelSpaceTimer();
+                    cancelDownTimer();
+                    downTimer = null;
+                    btnSpace.setEnabled(false);
+                    btnRecordList.setEnabled(false);
+                    btnUp.setEnabled(false);
+                    btnLeft.setEnabled(false);
+                    btnRight.setEnabled(false);
+                    btnDown.setEnabled(false);
+                    break;
+                case RESUME:
+                    downTimer = new Timer();
+                    downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
+                    btnSpace.setEnabled(true);
+                    btnRecordList.setEnabled(true);
+                    btnUp.setEnabled(true);
+                    btnLeft.setEnabled(true);
+                    btnRight.setEnabled(true);
+                    btnDown.setEnabled(true);
+                    break;
+                case REFRESH_SCORE:
+                    tvScore.setText(String.valueOf(score));
+                    if (score <= 1000) {
+                        level = 1;
+                        timeInterval = 800;
+                    } else if (score <= 2000) {
+                        level = 2;
+                        timeInterval = 750;
+                    } else if (score <= 3000) {
+                        level = 3;
+                        timeInterval = 700;
+                    } else if (score <= 5000) {
+                        level = 4;
+                        timeInterval = 650;
+                    } else if (score <= 7500) {
+                        level = 5;
+                        timeInterval = 600;
+                    } else if (score <= 10000) {
+                        level = 6;
+                        timeInterval = 550;
+                    } else if (score <= 12500) {
+                        level = 7;
+                        timeInterval = 500;
+                    } else if (score <= 15000) {
+                        level = 8;
+                        timeInterval = 450;
+                    } else {
+                        level = 9;
+                        timeInterval = 400;
+                    }
+                    tvLevel.setText(String.valueOf(level));
+                    break;
+                case GAME_OVER:
+                    cancelSpaceTimer();
+                    cancelDownTimer();
+                    llAnim.setVisibility(View.VISIBLE);
+                    animationDrawable.start();
+                    SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
+                    String recordList = sharedPreferences.getString(RECORDLIST, "");
+                    if (!recordList.isEmpty()) {
+                        Gson gson = new Gson();
+                        RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
+                        List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
+                        int size = recordBeanList.size();
+                        RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
+                        Integer lastScore = Integer.parseInt(recordBean.getScore());
+                        if (score >= lastScore) {
+                            RecordListBean listBean = new RecordListBean();
+                            List<RecordListBean.RecordBean> beanList = new ArrayList<>();
+                            beanList.addAll(recordBeanList);
+                            RecordListBean.RecordBean bean = new RecordListBean.RecordBean();
+                            bean.setName("匿名");
+                            bean.setScore(String.valueOf(score));
+                            bean.setTime(String.valueOf(System.currentTimeMillis()));
+                            beanList.add(bean);
+                            listBean.setRecordBeanList(beanList);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(RECORDLIST, new Gson().toJson(listBean));
+                            editor.commit();
+                        }
+                    } else {
+                        if (score > 0) {
+                            RecordListBean recordListBean = new RecordListBean();
+                            RecordListBean.RecordBean recordBean = new RecordListBean.RecordBean();
+                            recordBean.setName("匿名");
+                            recordBean.setScore(String.valueOf(score));
+                            recordBean.setTime(String.valueOf(System.currentTimeMillis()));
+                            List<RecordListBean.RecordBean> recordBeanList = new ArrayList<>();
+                            recordBeanList.add(recordBean);
+                            recordListBean.setRecordBeanList(recordBeanList);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(RECORDLIST, new Gson().toJson(recordListBean));
+                            editor.commit();
+                        }
+                    }
+                    break;
+                case RESET_DATA:
+                    initData();
+                    break;
+            }
+        }
+    };
+
     private void initView() {
-        gvTetris = (GridView) findViewById(R.id.gv_tetris);
+        gvBlockBoard = (GridView) findViewById(R.id.gv_block_board);
         tvScore = (LedTextView) findViewById(R.id.tv_score);
         tvLevel = (LedTextView) findViewById(R.id.tv_level);
         tvMaxScore = (LedTextView) findViewById(R.id.tv_max_score);
-        tvNextTetris = (TextView) findViewById(R.id.tv_next_tetris);
-        gvNextTetris = (GridView) findViewById(R.id.gv_next_tetris);
+        gvNextPiece = (GridView) findViewById(R.id.gv_next_piece);
         btnPause = (Button) findViewById(R.id.btn_pause);
         btnPause.setOnClickListener(this);
         btnRecordList = (Button) findViewById(R.id.btn_record_list);
@@ -417,8 +471,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         animationDrawable = (AnimationDrawable) ivAnim.getBackground();
         animationDrawable.stop();
         llAnim.setVisibility(View.GONE);
-        tvScore.setText("0");
-        tvLevel.setText("1");
+        score = 0;
+        level = 1;
+        tvScore.setText(String.valueOf(score));
+        tvLevel.setText(String.valueOf(level));
         tvMaxScore.setText("0");
         SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
         String recordList = sharedPreferences.getString(RECORDLIST, "");
@@ -431,38 +487,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Integer lastScore = Integer.parseInt(recordBean.getScore());
             tvMaxScore.setText(String.valueOf(lastScore));
         }
-        nextAdapter = new BlockAdapter();
-        gvNextTetris.setAdapter(nextAdapter);
-        blockAdapter = new BlockAdapter();
-        gvTetris.setAdapter(blockAdapter);
-        allArrays = new int[180];
-        previousAllArrays = new int[180];
-        for (int i = 0; i < 180; i++) {
-            allArrays[i] = 0;
+        nextPieceAdapter = new BlockAdapter();
+        gvNextPiece.setAdapter(nextPieceAdapter);
+        blockBoardAdapter = new BlockAdapter();
+        gvBlockBoard.setAdapter(blockBoardAdapter);
+        tempBlockBoardArray = new int[BOARDROW * BOARDCULUMN];
+        blockBoardArray = new int[BOARDROW * BOARDCULUMN];
+        for (int i = 0; i < BOARDROW * BOARDCULUMN; i++) {
+            tempBlockBoardArray[i] = 0;
         }
-        previousAllArrays = Arrays.copyOf(allArrays, 180);
-        uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
+        blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
+        uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
         currentPiece = PieceFatory.createPiece();
         currentPiece.getSimplePieceArray();
-        currentArrays = currentPiece.getPieceArray();
+        currentPieceArray = currentPiece.getPieceArray();
         row = currentPiece.getInitalRow();
         culumn = currentPiece.getInitalCulumn();
         nextPiece = PieceFatory.createPiece();
-        nextArrays = nextPiece.getSimplePieceArray();
-        nextAdapter.setColors(nextArrays);
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-        timer = new Timer();
-        timer.schedule(getTimerTask(), timeInterval, timeInterval);
+        nextPieceArray = nextPiece.getSimplePieceArray();
+        nextPieceAdapter.setColors(nextPieceArray);
+        uiHandler.sendEmptyMessage(RESUME);
     }
 
     private TimerTask getTimerTask() {
         return new TimerTask() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(INSTANT_REFRESH_BLOCKS);
+                handler.sendEmptyMessage(DOWN_TIMER_RUN);
                 row++;
             }
         };
@@ -474,34 +525,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
             case R.id.btn_pause:
-                if (isInitial) {
-                    if (spaceTimer != null) {
-                        spaceTimer.cancel();
-                        spaceTimer = null;
-                    }
-                    if (timer == null) {
-                        timer = new Timer();
-                        timer.schedule(getTimerTask(), timeInterval, timeInterval);
-                        uiHandler.sendEmptyMessage(RESUME);
-                    } else {
-                        timer.cancel();
-                        timer = null;
-                        uiHandler.sendEmptyMessage(PAUSE);
-                    }
+                if (isStart) {
+                    cancelSpaceTimer();
+                    uiHandler.sendEmptyMessage(PAUSE_RESUME);
                 }
                 break;
             case R.id.btn_record_list:
                 break;
             case R.id.btn_restart:
-                if (isInitial) {
-                    resetBlocks();
+                if (isStart) {
+                    handler.sendEmptyMessage(RESTART);
                 }
                 break;
             case R.id.btn_space:
-                if (spaceTimer != null) {
-                    spaceTimer.cancel();
-                    spaceTimer = null;
-                }
+                cancelSpaceTimer();
                 spaceTimer = new Timer();
                 spaceTimer.schedule(new TimerTask() {
                     @Override
@@ -529,36 +566,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                isInitial = false;
-                if (timer != null) {
-                    timer.cancel();
-                    timer = null;
-                }
-                for (int i = 18; i > 0; i--) {
-                    try {
-                        Thread.sleep(180);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    for (int j = 1; j <= 10; j++) {
-                        allArrays[(i - 1) * 10 + j - 1] = 1;
-                    }
-                    handler.sendEmptyMessage(REFRESH_BLOCKS);
-                }
-                for (int i = 1; i <= 18; i++) {
-                    try {
-                        Thread.sleep(180);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    for (int j = 1; j <= 10; j++) {
-                        allArrays[(i - 1) * 10 + j - 1] = 0;
-                    }
-                    handler.sendEmptyMessage(REFRESH_BLOCKS);
-                }
-                previousAllArrays = Arrays.copyOf(allArrays, 180);
-                isInitial = true;
-                handler.sendEmptyMessage(INIT_DATA);
             }
         });
         thread.start();
@@ -566,15 +573,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
+        cancelSpaceTimer();
+        cancelDownTimer();
+        handlerThread.quit();
+        super.onDestroy();
+    }
+
+    private void cancelDownTimer() {
+        if (downTimer != null) {
+            downTimer.cancel();
+            downTimer = null;
+        }
+    }
+
+    private void cancelSpaceTimer() {
         if (spaceTimer != null) {
             spaceTimer.cancel();
             spaceTimer = null;
         }
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-        handlerThread.quit();
-        super.onDestroy();
     }
 }
