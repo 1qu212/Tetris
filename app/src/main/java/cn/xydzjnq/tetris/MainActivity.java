@@ -256,6 +256,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setAllArrays();
                 previousAllArrays = Arrays.copyOf(allArrays, 180);
                 blockDispear();
+                uiHandler.sendEmptyMessage(RESUME);
+                row = currentBlock.getInitalRow();
+                if (!animationDrawable.isRunning() && timer == null) {
+                    timer = new Timer();
+                    timer.schedule(getTimerTask(), timeInterval, timeInterval);
+                }
+                currentBlock = nextBlock;
+                currentArrays = currentBlock.getShape();
+                culumn = currentBlock.getInitalCulumn();
+                nextBlock = BlockFatory.createBlock();
+                nextArrays = nextBlock.getSimpleShape();
+                scoreStep = 100;
+                uiHandler.sendEmptyMessage(REFRESH_NEXT_BLOCKS);
             }
 
             private void blockDispear() {
@@ -305,19 +318,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     }
                 }
-                uiHandler.sendEmptyMessage(RESUME);
-                row = currentBlock.getInitalRow();
-                if (!animationDrawable.isRunning() && timer == null) {
-                    timer = new Timer();
-                    timer.schedule(getTimerTask(), timeInterval, timeInterval);
-                }
-                currentBlock = nextBlock;
-                currentArrays = currentBlock.getShape();
-                culumn = currentBlock.getInitalCulumn();
-                nextBlock = BlockFatory.createBlock();
-                nextArrays = nextBlock.getSimpleShape();
-                scoreStep = 100;
-                uiHandler.sendEmptyMessage(REFRESH_NEXT_BLOCKS);
             }
 
             @Override
@@ -433,8 +433,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         nextAdapter = new BlockAdapter();
         gvNextTetris.setAdapter(nextAdapter);
-        nextArrays = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-        uiHandler.sendEmptyMessage(REFRESH_NEXT_BLOCKS);
         blockAdapter = new BlockAdapter();
         gvTetris.setAdapter(blockAdapter);
         allArrays = new int[180];

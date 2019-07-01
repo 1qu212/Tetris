@@ -122,10 +122,10 @@ public class TBlock extends Block {
         int randomInt = random.nextInt(2);
         switch (randomInt) {
             case 0:
-                state = 1;
+                state = 0;
                 break;
             case 1:
-                state = 3;
+                state = 2;
                 break;
         }
     }
