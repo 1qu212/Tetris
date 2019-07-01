@@ -1,86 +1,60 @@
-package cn.xydzjnq.tetris.block;
+package cn.xydzjnq.tetris.piece;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class LBlock extends Block {
-    //    private int[][] blockShapes = new int[][]{
-//            {
-//                    0, 1, 0, 0,
-//                    0, 1, 0, 0,
-//                    0, 1, 1, 0,
-//                    0, 0, 0, 0
-//            },
-//            {
-//                    0, 0, 0, 0,
-//                    0, 1, 1, 1,
-//                    0, 1, 0, 0,
-//                    0, 0, 0, 0
-//            },
-//            {
-//                    0, 0, 0, 0,
-//                    0, 1, 1, 0,
-//                    0, 0, 1, 0,
-//                    0, 0, 1, 0
-//            },
-//            {
-//                    0, 0, 0, 0,
-//                    0, 0, 1, 0,
-//                    1, 1, 1, 0,
-//                    0, 0, 0, 0
-//            }
-//    };
-    private int[][] blockShapes = new int[][]{
-            {
-                    1, 0, 0, 0,
-                    1, 0, 0, 0,
-                    1, 1, 0, 0,
-                    0, 0, 0, 0
-            },
+public class TPiece extends Piece {
+    private int[][] pieceArrays = new int[][]{
             {
                     1, 1, 1, 0,
-                    1, 0, 0, 0,
+                    0, 1, 0, 0,
                     0, 0, 0, 0,
                     0, 0, 0, 0
             },
             {
+                    0, 0, 1, 0,
                     0, 1, 1, 0,
                     0, 0, 1, 0,
-                    0, 0, 1, 0,
                     0, 0, 0, 0
             },
             {
                     0, 0, 0, 0,
-                    0, 0, 1, 0,
+                    0, 1, 0, 0,
                     1, 1, 1, 0,
+                    0, 0, 0, 0
+            },
+            {
+                    1, 0, 0, 0,
+                    1, 1, 0, 0,
+                    1, 0, 0, 0,
                     0, 0, 0, 0
             }
     };
 
     @Override
-    public int[] getShape() {
-        return blockShapes[state];
+    public int[] getPieceArray() {
+        return pieceArrays[state];
     }
 
     @Override
-    public int[] getSimpleShape() {
+    public int[] getSimplePieceArray() {
         initState();
         int[] simpleBlockShape = new int[8];
         switch (state) {
-            case 1:
+            case 0:
                 initalRow = 3;
-                simpleBlockShape = Arrays.copyOf(blockShapes[state], 8);
+                simpleBlockShape = Arrays.copyOf(pieceArrays[state], 8);
                 break;
-            case 3:
+            case 2:
                 initalRow = 2;
-                simpleBlockShape = Arrays.copyOfRange(blockShapes[state], 4, 12);
+                simpleBlockShape = Arrays.copyOfRange(pieceArrays[state], 4, 12);
                 break;
         }
         return simpleBlockShape;
     }
 
     @Override
-    public int[] nextShape() {
+    public int[] nextStatePieceArray() {
         switch (state) {
             case 0:
                 state = 1;
@@ -95,11 +69,11 @@ public class LBlock extends Block {
                 state = 0;
                 break;
         }
-        return getShape();
+        return getPieceArray();
     }
 
     @Override
-    public int[] previousShape() {
+    public int[] previousStatePieceArray() {
         switch (state) {
             case 0:
                 state = 3;
@@ -114,7 +88,7 @@ public class LBlock extends Block {
                 state = 2;
                 break;
         }
-        return getShape();
+        return getPieceArray();
     }
 
     private void initState() {
@@ -122,10 +96,10 @@ public class LBlock extends Block {
         int randomInt = random.nextInt(2);
         switch (randomInt) {
             case 0:
-                state = 1;
+                state = 0;
                 break;
             case 1:
-                state = 3;
+                state = 2;
                 break;
         }
     }

@@ -26,8 +26,8 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import cn.xydzjnq.tetris.bean.RecordListBean;
-import cn.xydzjnq.tetris.block.Block;
-import cn.xydzjnq.tetris.block.BlockFatory;
+import cn.xydzjnq.tetris.piece.Piece;
+import cn.xydzjnq.tetris.piece.PieceFatory;
 import cn.xydzjnq.tetris.view.LedTextView;
 
 import static cn.xydzjnq.tetris.Constant.CONFIG;
@@ -52,12 +52,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnLeft;
     private Button btnRight;
     private Button btnDown;
-    private Block currentBlock;
+    private Piece currentPiece;
     private ImageView ivAnim;
     private LinearLayout llAnim;
     private int row;
     private int culumn;
-    private Block nextBlock;
+    private Piece nextPiece;
     private int[] currentArrays;
     private int[] nextArrays;
     private int[] previousAllArrays;
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (i <= 18 && j >= 1 && j <= 10) {
                             if (currentArrays[(4 - (row - i) - 1) * 4 + (j - culumn)] != 0) {
                                 if (allArrays[(i - 1) * 10 + j - 1] != 0) {
-                                    if (row <= currentBlock.getInitalRow()) {
+                                    if (row <= currentPiece.getInitalRow()) {
                                         uiHandler.sendEmptyMessage(GAME_OVER);
                                     }
                                     return true;
@@ -257,16 +257,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 previousAllArrays = Arrays.copyOf(allArrays, 180);
                 blockDispear();
                 uiHandler.sendEmptyMessage(RESUME);
-                row = currentBlock.getInitalRow();
+                row = currentPiece.getInitalRow();
                 if (!animationDrawable.isRunning() && timer == null) {
                     timer = new Timer();
                     timer.schedule(getTimerTask(), timeInterval, timeInterval);
                 }
-                currentBlock = nextBlock;
-                currentArrays = currentBlock.getShape();
-                culumn = currentBlock.getInitalCulumn();
-                nextBlock = BlockFatory.createBlock();
-                nextArrays = nextBlock.getSimpleShape();
+                currentPiece = nextPiece;
+                currentArrays = currentPiece.getPieceArray();
+                culumn = currentPiece.getInitalCulumn();
+                nextPiece = PieceFatory.createPiece();
+                nextArrays = nextPiece.getSimplePieceArray();
                 scoreStep = 100;
                 uiHandler.sendEmptyMessage(REFRESH_NEXT_BLOCKS);
             }
@@ -344,9 +344,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
                     case 4:
-                        currentArrays = currentBlock.nextShape();
+                        currentArrays = currentPiece.nextStatePieceArray();
                         if (isCollision()) {
-                            currentArrays = currentBlock.previousShape();
+                            currentArrays = currentPiece.previousStatePieceArray();
                         } else {
                             setAllArrays();
                             uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
@@ -442,13 +442,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         previousAllArrays = Arrays.copyOf(allArrays, 180);
         uiHandler.sendEmptyMessage(REFRESH_BLOCKS);
-        currentBlock = BlockFatory.createBlock();
-        currentBlock.getSimpleShape();
-        currentArrays = currentBlock.getShape();
-        row = currentBlock.getInitalRow();
-        culumn = currentBlock.getInitalCulumn();
-        nextBlock = BlockFatory.createBlock();
-        nextArrays = nextBlock.getSimpleShape();
+        currentPiece = PieceFatory.createPiece();
+        currentPiece.getSimplePieceArray();
+        currentArrays = currentPiece.getPieceArray();
+        row = currentPiece.getInitalRow();
+        culumn = currentPiece.getInitalCulumn();
+        nextPiece = PieceFatory.createPiece();
+        nextArrays = nextPiece.getSimplePieceArray();
         nextAdapter.setColors(nextArrays);
         if (timer != null) {
             timer.cancel();
@@ -474,18 +474,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
             case R.id.btn_pause:
-                if (spaceTimer != null) {
-                    spaceTimer.cancel();
-                    spaceTimer = null;
-                }
-                if (timer == null) {
-                    timer = new Timer();
-                    timer.schedule(getTimerTask(), timeInterval, timeInterval);
-                    uiHandler.sendEmptyMessage(RESUME);
-                } else {
-                    timer.cancel();
-                    timer = null;
-                    uiHandler.sendEmptyMessage(PAUSE);
+                if (isInitial) {
+                    if (spaceTimer != null) {
+                        spaceTimer.cancel();
+                        spaceTimer = null;
+                    }
+                    if (timer == null) {
+                        timer = new Timer();
+                        timer.schedule(getTimerTask(), timeInterval, timeInterval);
+                        uiHandler.sendEmptyMessage(RESUME);
+                    } else {
+                        timer.cancel();
+                        timer = null;
+                        uiHandler.sendEmptyMessage(PAUSE);
+                    }
                 }
                 break;
             case R.id.btn_record_list:
