@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 
 import cn.xydzjnq.tetris.bean.RecordListBean;
 import cn.xydzjnq.tetris.piece.Piece;
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int scoreStep = 100;
     private HandlerThread handlerThread;
     private Handler handler;
-    private final static int DOWN_TIMER_RUN = 0;
     private final static int RESTART = 1;
     private final static int UP = 2;
     private final static int LEFT = 3;
@@ -101,22 +99,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         initData();
-        handlerThread = new HandlerThread(UUID.randomUUID().toString(), -2);
+        handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what) {
-                    case DOWN_TIMER_RUN:
-                        if (isCollision()) {
-                            row--;
-                            touchBottom();
-                        } else {
-                            setTempBlockBoardArray();
-                            uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
-                        }
-                        break;
                     case RESTART:
                         isStart = false;
                         cancelDownTimer();
@@ -214,6 +203,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (count == PIECEROW) {
                     return false;
                 }
+                if (row <= currentPiece.getInitalRow()) {
+                    return false;
+                }
                 return true;
             }
 
@@ -240,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
                 //再消除满行
                 lineDispear();
-                row = currentPiece.getInitalRow();
+                row = currentPiece.getInitalRow() - 1;
                 currentPiece = nextPiece;
                 currentPieceArray = currentPiece.getPieceArray();
                 culumn = currentPiece.getInitalCulumn();
@@ -501,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentPiece = PieceFatory.createPiece();
         currentPiece.getSimplePieceArray();
         currentPieceArray = currentPiece.getPieceArray();
-        row = currentPiece.getInitalRow();
+        row = currentPiece.getInitalRow() - 1;
         culumn = currentPiece.getInitalCulumn();
         nextPiece = PieceFatory.createPiece();
         nextPieceArray = nextPiece.getSimplePieceArray();
@@ -513,8 +505,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return new TimerTask() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(DOWN_TIMER_RUN);
-                row++;
+                handler.sendEmptyMessage(DOWN);
             }
         };
     }
@@ -538,14 +529,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btn_space:
-                cancelSpaceTimer();
-                spaceTimer = new Timer();
-                spaceTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        handler.sendEmptyMessage(DOWN);
-                    }
-                }, 0, 50);
+                if (!animationDrawable.isRunning()) {
+                    btnSpace.setEnabled(false);
+                    cancelSpaceTimer();
+                    spaceTimer = new Timer();
+                    spaceTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            handler.sendEmptyMessage(DOWN);
+                        }
+                    }, 50, 50);
+                }
                 break;
             case R.id.btn_up:
                 handler.sendEmptyMessage(UP);
@@ -560,15 +554,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handler.sendEmptyMessage(DOWN);
                 break;
         }
-    }
-
-    private void resetBlocks() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        });
-        thread.start();
     }
 
     @Override
