@@ -232,6 +232,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
                 //再消除满行
                 lineDispear();
+                //第一行有亮方块则游戏结束
+                for (int i = 0; i < BOARDCULUMN; i++) {
+                    if (blockBoardArray[i] != 0) {
+                        uiHandler.sendEmptyMessage(GAME_OVER);
+                        return;
+                    }
+                }
                 row = currentPiece.getInitalRow() - 1;
                 currentPiece = nextPiece;
                 currentPieceArray = currentPiece.getPieceArray();
