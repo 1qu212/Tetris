@@ -1,7 +1,7 @@
 @[TOC](经典俄罗斯方块Android版)
 
 # 缘起
-在GitHub上看到[react-tetris](https://github.com/chvin/react-tetris)版本的俄罗斯方块，长这样的：![](./screenshot/tetris_01.gif)
+在GitHub上看到[react-tetris](https://github.com/chvin/react-tetris)版本的俄罗斯方块，长这样的：![tetris](./app/screenshot/tetris_01.gif)
 
 好炫，我也要做一个，心里产生了这样的想法。然后就有了[经典俄罗斯方块（Android版）](https://github.com/1qu212/Tetris)。
 项目地址:[https://github.com/1qu212/Tetris](https://github.com/1qu212/Tetris)。
