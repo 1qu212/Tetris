@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int culumn;
     //界面的行数和列数
     private final static int BOARDROW = 18;
-    private final static int BOARDCULUMN = 10;
+    public final static int BOARDCULUMN = 10;
     //方块片的行数和列数
     private final static int PIECEROW = 4;
     private final static int PIECECULUMN = 4;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //方块片快速下落定时器
     private Timer spaceTimer;
     //下落的时间间隔
-    private int timeInterval = 600;
+    private int timeInterval = 800;
     //等级
     private int level = 1;
     //分数
@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (count == PIECEROW) {
                     return false;
                 }
-                if (row <= currentPiece.getInitalRow()) {
-                    return false;
+                if (row <= PIECEROW) {
+                    return currentPiece.isCollision(culumn);
                 }
                 return true;
             }

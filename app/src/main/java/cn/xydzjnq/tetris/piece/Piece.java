@@ -30,6 +30,8 @@ public abstract class Piece {
      */
     public abstract int[] previousStatePieceArray();
 
+    public abstract boolean isCollision(int culumn);
+
     public int getInitalRow() {
         return initalRow;
     }

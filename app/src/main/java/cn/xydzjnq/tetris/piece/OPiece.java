@@ -2,6 +2,8 @@ package cn.xydzjnq.tetris.piece;
 
 import java.util.Arrays;
 
+import static cn.xydzjnq.tetris.MainActivity.BOARDCULUMN;
+
 public class OPiece extends Piece {
     private int[][] pieceArrays = new int[][]{
             {
@@ -25,6 +27,15 @@ public class OPiece extends Piece {
     @Override
     public int[] previousStatePieceArray() {
         return getPieceArray();
+    }
+
+    @Override
+    public boolean isCollision(int culumn) {
+        if (culumn >= 0 && culumn <= BOARDCULUMN - 2) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override

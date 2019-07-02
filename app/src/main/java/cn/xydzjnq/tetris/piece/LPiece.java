@@ -3,6 +3,8 @@ package cn.xydzjnq.tetris.piece;
 import java.util.Arrays;
 import java.util.Random;
 
+import static cn.xydzjnq.tetris.MainActivity.BOARDCULUMN;
+
 public class LPiece extends Piece {
     private int[][] pieceArrays = new int[][]{
             {
@@ -89,6 +91,38 @@ public class LPiece extends Piece {
                 break;
         }
         return getPieceArray();
+    }
+
+    @Override
+    public boolean isCollision(int culumn) {
+        switch (state) {
+            default:
+                return true;
+            case 0:
+                if (culumn >= 1 && culumn <= BOARDCULUMN - 1) {
+                    return false;
+                } else {
+                    return true;
+                }
+            case 1:
+                if (culumn >= 1 && culumn < BOARDCULUMN - 2) {
+                    return false;
+                } else {
+                    return true;
+                }
+            case 2:
+                if (culumn >= 0 && culumn <= BOARDCULUMN - 2) {
+                    return false;
+                } else {
+                    return true;
+                }
+            case 3:
+                if (culumn >= 1 && culumn <= BOARDCULUMN - 2) {
+                    return false;
+                } else {
+                    return true;
+                }
+        }
     }
 
     private void initState() {
