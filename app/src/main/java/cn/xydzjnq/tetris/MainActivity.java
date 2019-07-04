@@ -2,7 +2,6 @@ package cn.xydzjnq.tetris;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
@@ -91,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static int LEFT = 3;
     private final static int RIGHT = 4;
     private final static int DOWN = 5;
-//    private AnimationDrawable animationDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +224,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
              * 方块片到界面底部了
              */
             private void touchBottom() {
+                cancelSpaceTimer();
+                cancelDownTimer();
                 uiHandler.sendEmptyMessage(PAUSE);
                 setTempBlockBoardArray();
                 //触底先保存现在的界面状态
@@ -249,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 scoreStep = 100;
                 uiHandler.sendEmptyMessage(REFRESH_NEXT_PIECE);
                 uiHandler.sendEmptyMessage(RESUME);
+                downTimer = new Timer();
+                downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
             }
 
             /**
@@ -338,9 +339,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     break;
                 case PAUSE:
-                    cancelSpaceTimer();
-                    cancelDownTimer();
-                    downTimer = null;
                     btnSpace.setEnabled(false);
                     btnRecordList.setEnabled(false);
                     btnUp.setEnabled(false);
@@ -349,8 +347,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     btnDown.setEnabled(false);
                     break;
                 case RESUME:
-                    downTimer = new Timer();
-                    downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
                     btnSpace.setEnabled(true);
                     btnRecordList.setEnabled(true);
                     btnUp.setEnabled(true);
@@ -506,6 +502,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nextPieceArray = nextPiece.getSimplePieceArray();
         nextPieceAdapter.setColors(nextPieceArray);
         uiHandler.sendEmptyMessage(RESUME);
+        downTimer = new Timer();
+        downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
     }
 
     private TimerTask getTimerTask() {
@@ -538,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_space:
                 if (!govAnim.isRunning()) {
                     btnSpace.setEnabled(false);
+                    cancelDownTimer();
                     cancelSpaceTimer();
                     spaceTimer = new Timer();
                     spaceTimer.schedule(new TimerTask() {
@@ -545,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void run() {
                             handler.sendEmptyMessage(DOWN);
                         }
-                    }, 50, 50);
+                    }, 0, 20);
                 }
                 break;
             case R.id.btn_up:
