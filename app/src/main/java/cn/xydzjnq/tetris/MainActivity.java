@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import cn.xydzjnq.tetris.bean.RecordListBean;
 import cn.xydzjnq.tetris.piece.Piece;
 import cn.xydzjnq.tetris.piece.PieceFatory;
+import cn.xydzjnq.tetris.view.GameOverView;
 import cn.xydzjnq.tetris.view.LedTextView;
 
 import static cn.xydzjnq.tetris.Constant.CONFIG;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnRight;
     private Button btnDown;
     private Piece currentPiece;
-    private ImageView ivAnim;
+    private GameOverView govAnim;
     private LinearLayout llAnim;
     //方块片左下角在整个界面的行和列
     private int row;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static int LEFT = 3;
     private final static int RIGHT = 4;
     private final static int DOWN = 5;
-    private AnimationDrawable animationDrawable;
+//    private AnimationDrawable animationDrawable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -315,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     nextPieceAdapter.setColors(nextPieceArray);
                     break;
                 case PAUSE_RESUME:
-                    if (!animationDrawable.isRunning() && downTimer == null) {
+                    if (!govAnim.isRunning() && downTimer == null) {
                         downTimer = new Timer();
                         downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
                         btnSpace.setEnabled(true);
@@ -393,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cancelSpaceTimer();
                     cancelDownTimer();
                     llAnim.setVisibility(View.VISIBLE);
-                    animationDrawable.start();
+                    govAnim.start();
                     SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
                     String recordList = sharedPreferences.getString(RECORDLIST, "");
                     if (!recordList.isEmpty()) {
@@ -462,13 +463,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnRight.setOnClickListener(this);
         btnDown = (Button) findViewById(R.id.btn_down);
         btnDown.setOnClickListener(this);
-        ivAnim = (ImageView) findViewById(R.id.iv_anim);
+        govAnim = (GameOverView) findViewById(R.id.gov_anim);
         llAnim = (LinearLayout) findViewById(R.id.ll_anim);
     }
 
     private void initData() {
-        animationDrawable = (AnimationDrawable) ivAnim.getBackground();
-        animationDrawable.stop();
+        govAnim.stop();
         llAnim.setVisibility(View.GONE);
         score = 0;
         level = 1;
@@ -536,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btn_space:
-                if (!animationDrawable.isRunning()) {
+                if (!govAnim.isRunning()) {
                     btnSpace.setEnabled(false);
                     cancelSpaceTimer();
                     spaceTimer = new Timer();
@@ -568,6 +568,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         cancelSpaceTimer();
         cancelDownTimer();
         handlerThread.quit();
+        govAnim.stop();
         super.onDestroy();
     }
 

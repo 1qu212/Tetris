@@ -8,7 +8,7 @@
 ## 界面设计
 界面使用**GridView**的想法来自[Android使用GridView实现简单的俄罗斯方块](https://github.com/weijifen/AndroidTetris)。
 
-左侧界面和右侧下一个方块片使用的是**GridView**；每一个方格是使用**selector**做的；分数、等级、最高分的数字显示使用了**特定字体**；按键则使用了**selector**；游戏结束的动画使用了[react-tetris](https://github.com/chvin/react-tetris)中的图片，使用美图秀秀裁成需要的四张图片，合成了一个**帧动画**。
+左侧界面和右侧下一个方块片使用的是**GridView**；每一个方格是使用**selector**做的；分数、等级、最高分的数字显示使用了**特定字体**；按键则使用了**selector**；游戏结束的动画使用了[react-tetris](https://github.com/chvin/react-tetris)中的图片，~~使用美图秀秀裁成需要的四张图片，合成了一个**帧动画**~~==利用canvas.drawBitmap(mBitmap, src, dst, null)自定义view达到动画效果==。
 
 
 ## 方块片的设计

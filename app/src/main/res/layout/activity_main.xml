@@ -148,14 +148,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="75dp"
+            android:layout_marginLeft="70dp"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/iv_anim"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/anim_wait" />
+            <cn.xydzjnq.tetris.view.GameOverView
+                android:id="@+id/gov_anim"
+                android:layout_width="100dp"
+                android:layout_height="90dp" />
 
             <TextView
                 android:layout_width="match_parent"
