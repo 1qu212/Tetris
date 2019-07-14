@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class ConfigSPUtils {
-    public final static String SPNAME = "config";
+    private final static String SPNAME = "config";
     public final static String RECORDLIST = "recordList";
 
     public static boolean putString(Context context, String key, String value) {
@@ -89,11 +89,11 @@ public class ConfigSPUtils {
 
     public static void clearPreferences(Context context) {
         SharedPreferences settings = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
-        settings.edit().clear().commit();
+        settings.edit().clear().apply();
     }
 
     public static void clearPreferencesByKey(Context context, String key) {
         SharedPreferences settings = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
-        settings.edit().remove(key).commit();
+        settings.edit().remove(key).apply();
     }
 }

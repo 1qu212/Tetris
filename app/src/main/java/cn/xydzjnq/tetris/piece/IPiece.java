@@ -65,17 +65,9 @@ public class IPiece extends Piece {
             default:
                 return true;
             case 0:
-                if (culumn >= 0 && culumn <= BOARDCULUMN - 1) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 0 || culumn > BOARDCULUMN - 1;
             case 1:
-                if (culumn >= 1 && culumn <= BOARDCULUMN - 3) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 1 || culumn > BOARDCULUMN - 3;
         }
     }
 

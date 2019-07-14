@@ -4,7 +4,7 @@ public abstract class Piece {
     int state = 0;
     //在整个界面上初始行初始列（即方块片左下角在整个界面的位置）
     int initalRow = 1;
-    int initalCulumn = 4;
+    private int initalCulumn = 4;
 
     /**
      * @return 代表一个方块片的数组

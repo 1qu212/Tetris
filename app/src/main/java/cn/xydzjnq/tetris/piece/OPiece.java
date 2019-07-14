@@ -32,11 +32,7 @@ public class OPiece extends Piece {
 
     @Override
     public boolean isCollision(int culumn) {
-        if (culumn >= 0 && culumn <= BOARDCULUMN - 2) {
-            return false;
-        } else {
-            return true;
-        }
+        return culumn < 0 || culumn > BOARDCULUMN - 2;
     }
 
     @Override

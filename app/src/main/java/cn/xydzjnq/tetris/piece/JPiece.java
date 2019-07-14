@@ -100,29 +100,13 @@ public class JPiece extends Piece {
             default:
                 return true;
             case 0:
-                if (culumn >= 0 && culumn <= BOARDCULUMN - 2) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 0 || culumn > BOARDCULUMN - 2;
             case 1:
-                if (culumn >= 1 && culumn < BOARDCULUMN - 2) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 1 || culumn >= BOARDCULUMN - 2;
             case 2:
-                if (culumn >= 1 && culumn <= BOARDCULUMN - 1) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 1 || culumn > BOARDCULUMN - 1;
             case 3:
-                if (culumn >= 1 && culumn <= BOARDCULUMN - 2) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return culumn < 1 || culumn > BOARDCULUMN - 2;
         }
     }
 

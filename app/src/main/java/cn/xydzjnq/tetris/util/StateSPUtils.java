@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class StateSPUtils {
-    public final static String SPNAME = "state";
+    private final static String SPNAME = "state";
     public final static String STATEBEAN = "stateBean";
 
     public static boolean putString(Context context, String key, String value) {
@@ -89,11 +89,11 @@ public class StateSPUtils {
 
     public static void clearPreferences(Context context) {
         SharedPreferences settings = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
-        settings.edit().clear().commit();
+        settings.edit().clear().apply();
     }
 
     public static void clearPreferencesByKey(Context context, String key) {
         SharedPreferences settings = context.getSharedPreferences(SPNAME, Context.MODE_PRIVATE);
-        settings.edit().remove(key).commit();
+        settings.edit().remove(key).apply();
     }
 }

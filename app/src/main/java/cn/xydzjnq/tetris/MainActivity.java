@@ -279,9 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                         for (int x = i; x >= 2; x--) {
-                            for (int j = 1; j <= BOARDCULUMN; j++) {
-                                tempBlockBoardArray[(x - 1) * BOARDCULUMN + j - 1] = tempBlockBoardArray[(x - 2) * BOARDCULUMN + j - 1];
-                            }
+                            System.arraycopy(tempBlockBoardArray, (x - 2) * 10 + 1 - 1, tempBlockBoardArray, (x - 1) * 10 + 1 - 1, BOARDCULUMN);
                         }
                         for (int x = 0; x < BOARDCULUMN; x++) {
                             tempBlockBoardArray[x] = 0;
@@ -400,11 +398,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
                         int size = recordBeanList.size();
                         RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
-                        Integer lastScore = Integer.parseInt(recordBean.getScore());
+                        int lastScore = Integer.parseInt(recordBean.getScore());
                         if (score >= lastScore) {
                             RecordListBean listBean = new RecordListBean();
-                            List<RecordListBean.RecordBean> beanList = new ArrayList<>();
-                            beanList.addAll(recordBeanList);
+                            List<RecordListBean.RecordBean> beanList = new ArrayList<>(recordBeanList);
                             RecordListBean.RecordBean bean = new RecordListBean.RecordBean();
                             bean.setName("匿名");
                             bean.setScore(String.valueOf(score));
