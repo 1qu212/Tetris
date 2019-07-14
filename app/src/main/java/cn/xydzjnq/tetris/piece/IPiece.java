@@ -5,6 +5,7 @@ import java.util.Arrays;
 import static cn.xydzjnq.tetris.MainActivity.BOARDCULUMN;
 
 public class IPiece extends Piece {
+    private String shape = "I";
     private int[][] pieceArrays = new int[][]{
             {
                     0, 1, 0, 0,
@@ -76,6 +77,11 @@ public class IPiece extends Piece {
                     return true;
                 }
         }
+    }
+
+    @Override
+    public String getShape() {
+        return shape;
     }
 
     private void initState() {

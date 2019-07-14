@@ -7,25 +7,21 @@ public abstract class Piece {
     int initalCulumn = 4;
 
     /**
-     *
      * @return 代表一个方块片的数组
      */
     public abstract int[] getPieceArray();
 
     /**
-     *
      * @return 即代表方块片简化后的数组
      */
     public abstract int[] getSimplePieceArray();
 
     /**
-     *
      * @return 方块片下一个形态的数组
      */
     public abstract int[] nextStatePieceArray();
 
     /**
-     *
      * @return 方块片前一个形态的数组
      */
     public abstract int[] previousStatePieceArray();
@@ -38,5 +34,15 @@ public abstract class Piece {
 
     public int getInitalCulumn() {
         return initalCulumn;
+    }
+
+    public abstract String getShape();
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }

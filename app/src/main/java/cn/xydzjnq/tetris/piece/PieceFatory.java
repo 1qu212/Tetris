@@ -18,4 +18,36 @@ public class PieceFatory {
         int randomInt = random.nextInt(6);
         return pieceList.get(randomInt);
     }
+
+    public static Piece createPiece(String shape, int state) {
+        Piece piece;
+        switch (shape) {
+            default:
+                piece = new IPiece();
+                break;
+            case "I":
+                piece = new IPiece();
+                break;
+            case "J":
+                piece = new JPiece();
+                break;
+            case "L":
+                piece = new LPiece();
+                break;
+            case "O":
+                piece = new OPiece();
+                break;
+            case "S":
+                piece = new SPiece();
+                break;
+            case "T":
+                piece = new TPiece();
+                break;
+            case "Z":
+                piece = new ZPiece();
+                break;
+        }
+        piece.setState(state);
+        return piece;
+    }
 }

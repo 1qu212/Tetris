@@ -1,12 +1,11 @@
 package cn.xydzjnq.tetris;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -22,13 +21,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.xydzjnq.tetris.bean.RecordListBean;
+import cn.xydzjnq.tetris.bean.StateBean;
 import cn.xydzjnq.tetris.piece.Piece;
 import cn.xydzjnq.tetris.piece.PieceFatory;
+import cn.xydzjnq.tetris.util.ConfigSPUtils;
+import cn.xydzjnq.tetris.util.StateSPUtils;
 import cn.xydzjnq.tetris.view.GameOverView;
 import cn.xydzjnq.tetris.view.LedTextView;
 
-import static cn.xydzjnq.tetris.Constant.CONFIG;
-import static cn.xydzjnq.tetris.Constant.RECORDLIST;
+import static cn.xydzjnq.tetris.util.ConfigSPUtils.RECORDLIST;
+import static cn.xydzjnq.tetris.util.StateSPUtils.STATEBEAN;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static String TAG = "MainActivity";
@@ -391,8 +393,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cancelDownTimer();
                     llAnim.setVisibility(View.VISIBLE);
                     govAnim.start();
-                    SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
-                    String recordList = sharedPreferences.getString(RECORDLIST, "");
+                    String recordList = ConfigSPUtils.getString(getApplication(), RECORDLIST);
                     if (!recordList.isEmpty()) {
                         Gson gson = new Gson();
                         RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
@@ -410,9 +411,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             bean.setTime(String.valueOf(System.currentTimeMillis()));
                             beanList.add(bean);
                             listBean.setRecordBeanList(beanList);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(RECORDLIST, new Gson().toJson(listBean));
-                            editor.commit();
+                            ConfigSPUtils.putString(getApplication(), RECORDLIST, new Gson().toJson(listBean));
                         }
                     } else {
                         if (score > 0) {
@@ -424,14 +423,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             List<RecordListBean.RecordBean> recordBeanList = new ArrayList<>();
                             recordBeanList.add(recordBean);
                             recordListBean.setRecordBeanList(recordBeanList);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(RECORDLIST, new Gson().toJson(recordListBean));
-                            editor.commit();
+                            ConfigSPUtils.putString(getApplication(), RECORDLIST, new Gson().toJson(recordListBean));
                         }
                     }
                     break;
                 case RESET_DATA:
-                    initData();
+                    resetData();
                     break;
             }
         }
@@ -466,13 +463,74 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initData() {
         govAnim.stop();
         llAnim.setVisibility(View.GONE);
+        tvMaxScore.setText("0");
+        String recordList = ConfigSPUtils.getString(getApplication(), RECORDLIST);
+        if (!TextUtils.isEmpty(recordList)) {
+            Gson gson = new Gson();
+            RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
+            List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
+            int size = recordBeanList.size();
+            RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
+            Integer lastScore = Integer.parseInt(recordBean.getScore());
+            tvMaxScore.setText(String.valueOf(lastScore));
+        }
+        String stateStr = StateSPUtils.getString(getApplication(), STATEBEAN);
+        if (TextUtils.isEmpty(stateStr)) {
+            currentPiece = PieceFatory.createPiece();
+            currentPiece.getSimplePieceArray();
+            row = currentPiece.getInitalRow() - 1;
+            culumn = currentPiece.getInitalCulumn();
+            currentPieceArray = currentPiece.getPieceArray();
+            nextPiece = PieceFatory.createPiece();
+            nextPieceArray = nextPiece.getSimplePieceArray();
+            blockBoardArray = new int[BOARDROW * BOARDCULUMN];
+            tempBlockBoardArray = new int[BOARDROW * BOARDCULUMN];
+            for (int i = 0; i < BOARDROW * BOARDCULUMN; i++) {
+                blockBoardArray[i] = 0;
+            }
+            tempBlockBoardArray = Arrays.copyOf(blockBoardArray, BOARDROW * BOARDCULUMN);
+            score = 0;
+            level = 1;
+        } else {
+            Gson gson = new Gson();
+            StateBean stateBean = gson.fromJson(stateStr, StateBean.class);
+            row = stateBean.getRow();
+            culumn = stateBean.getCulumn();
+            currentPieceArray = stateBean.getCurrentPieceArray();
+            nextPieceArray = stateBean.getNextPieceArray();
+            blockBoardArray = stateBean.getBlockBoardArray();
+            tempBlockBoardArray = stateBean.getTempBlockBoardArray();
+            String currentShape = stateBean.getCurrentShape();
+            int currentState = stateBean.getCurrentState();
+            currentPiece = PieceFatory.createPiece(currentShape, currentState);
+            String nextShape = stateBean.getNextShape();
+            int nextState = stateBean.getNextState();
+            nextPiece = PieceFatory.createPiece(nextShape, nextState);
+            score = stateBean.getScore();
+            level = stateBean.getLevel();
+        }
+        tvScore.setText(String.valueOf(score));
+        tvLevel.setText(String.valueOf(level));
+        nextPieceAdapter = new BlockAdapter();
+        gvNextPiece.setAdapter(nextPieceAdapter);
+        blockBoardAdapter = new BlockAdapter();
+        gvBlockBoard.setAdapter(blockBoardAdapter);
+        uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
+        nextPieceAdapter.setColors(nextPieceArray);
+        uiHandler.sendEmptyMessage(RESUME);
+        downTimer = new Timer();
+        downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
+    }
+
+    private void resetData() {
+        govAnim.stop();
+        llAnim.setVisibility(View.GONE);
         score = 0;
         level = 1;
         tvScore.setText(String.valueOf(score));
         tvLevel.setText(String.valueOf(level));
         tvMaxScore.setText("0");
-        SharedPreferences sharedPreferences = getSharedPreferences(CONFIG, Context.MODE_PRIVATE);
-        String recordList = sharedPreferences.getString(RECORDLIST, "");
+        String recordList = ConfigSPUtils.getString(getApplication(), RECORDLIST);
         if (!recordList.isEmpty()) {
             Gson gson = new Gson();
             RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
@@ -482,24 +540,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Integer lastScore = Integer.parseInt(recordBean.getScore());
             tvMaxScore.setText(String.valueOf(lastScore));
         }
+        currentPiece = PieceFatory.createPiece();
+        currentPiece.getSimplePieceArray();
+        row = currentPiece.getInitalRow() - 1;
+        culumn = currentPiece.getInitalCulumn();
+        currentPieceArray = currentPiece.getPieceArray();
+        nextPiece = PieceFatory.createPiece();
+        nextPieceArray = nextPiece.getSimplePieceArray();
+        blockBoardArray = new int[BOARDROW * BOARDCULUMN];
+        tempBlockBoardArray = new int[BOARDROW * BOARDCULUMN];
+        for (int i = 0; i < BOARDROW * BOARDCULUMN; i++) {
+            blockBoardArray[i] = 0;
+        }
+        tempBlockBoardArray = Arrays.copyOf(blockBoardArray, BOARDROW * BOARDCULUMN);
         nextPieceAdapter = new BlockAdapter();
         gvNextPiece.setAdapter(nextPieceAdapter);
         blockBoardAdapter = new BlockAdapter();
         gvBlockBoard.setAdapter(blockBoardAdapter);
-        tempBlockBoardArray = new int[BOARDROW * BOARDCULUMN];
-        blockBoardArray = new int[BOARDROW * BOARDCULUMN];
-        for (int i = 0; i < BOARDROW * BOARDCULUMN; i++) {
-            tempBlockBoardArray[i] = 0;
-        }
-        blockBoardArray = Arrays.copyOf(tempBlockBoardArray, BOARDROW * BOARDCULUMN);
         uiHandler.sendEmptyMessage(REFRESH_BLOCK_BOARD);
-        currentPiece = PieceFatory.createPiece();
-        currentPiece.getSimplePieceArray();
-        currentPieceArray = currentPiece.getPieceArray();
-        row = currentPiece.getInitalRow() - 1;
-        culumn = currentPiece.getInitalCulumn();
-        nextPiece = PieceFatory.createPiece();
-        nextPieceArray = nextPiece.getSimplePieceArray();
         nextPieceAdapter.setColors(nextPieceArray);
         uiHandler.sendEmptyMessage(RESUME);
         downTimer = new Timer();
@@ -560,6 +618,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handler.sendEmptyMessage(DOWN);
                 break;
         }
+    }
+
+    @Override
+    protected void onStop() {
+        StateBean stateBean = new StateBean();
+        stateBean.setRow(row);
+        stateBean.setCulumn(culumn);
+        stateBean.setCurrentPieceArray(currentPieceArray);
+        stateBean.setCurrentShape(currentPiece.getShape());
+        stateBean.setCurrentState(currentPiece.getState());
+        stateBean.setNextPieceArray(nextPieceArray);
+        stateBean.setNextShape(nextPiece.getShape());
+        stateBean.setNextState(nextPiece.getState());
+        stateBean.setBlockBoardArray(blockBoardArray);
+        stateBean.setTempBlockBoardArray(tempBlockBoardArray);
+        stateBean.setLevel(level);
+        stateBean.setScore(score);
+        StateSPUtils.putString(getApplication(), STATEBEAN, new Gson().toJson(stateBean));
+        super.onStop();
     }
 
     @Override

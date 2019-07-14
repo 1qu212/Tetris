@@ -6,6 +6,7 @@ import java.util.Random;
 import static cn.xydzjnq.tetris.MainActivity.BOARDCULUMN;
 
 public class LPiece extends Piece {
+    private String shape = "L";
     private int[][] pieceArrays = new int[][]{
             {
                     1, 0, 0, 0,
@@ -123,6 +124,11 @@ public class LPiece extends Piece {
                     return true;
                 }
         }
+    }
+
+    @Override
+    public String getShape() {
+        return shape;
     }
 
     private void initState() {

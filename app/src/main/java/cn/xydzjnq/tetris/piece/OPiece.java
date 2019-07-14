@@ -5,6 +5,7 @@ import java.util.Arrays;
 import static cn.xydzjnq.tetris.MainActivity.BOARDCULUMN;
 
 public class OPiece extends Piece {
+    private String shape = "O";
     private int[][] pieceArrays = new int[][]{
             {
                     0, 0, 0, 0,
@@ -42,5 +43,10 @@ public class OPiece extends Piece {
     public int[] getSimplePieceArray() {
         initalRow = 2;
         return Arrays.copyOfRange(pieceArrays[state], 4, 12);
+    }
+
+    @Override
+    public String getShape() {
+        return shape;
     }
 }
