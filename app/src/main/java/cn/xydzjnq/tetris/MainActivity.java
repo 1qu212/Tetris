@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     llAnim.setVisibility(View.VISIBLE);
                     govAnim.start();
                     String recordList = ConfigSPUtils.getString(getApplication(), RECORDLIST);
-                    if (!recordList.isEmpty()) {
+                    if (!TextUtils.isEmpty(recordList)) {
                         Gson gson = new Gson();
                         RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
                         List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvLevel.setText(String.valueOf(level));
         tvMaxScore.setText("0");
         String recordList = ConfigSPUtils.getString(getApplication(), RECORDLIST);
-        if (!recordList.isEmpty()) {
+        if (!TextUtils.isEmpty(recordList)) {
             Gson gson = new Gson();
             RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
             List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
