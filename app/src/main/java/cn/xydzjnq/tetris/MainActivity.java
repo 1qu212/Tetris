@@ -398,7 +398,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                         List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
                         RecordListBean.RecordBean recordBean = recordBeanList.get(0);
                         int lastScore = Integer.parseInt(recordBean.getScore());
-                        if (score >= lastScore) {
+                        if (score > lastScore) {
                             showNewRecordDialog(recordBeanList);
                         }
                     } else {
