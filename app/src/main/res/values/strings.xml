@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">Tetris</string>
+    <string name="score">您的新纪录</string>
+    <string name="user_name">请输入您的昵称</string>
+    <string name="user_name_hint">匿名</string>
+    <string name="confirm">确定</string>
+    <string name="score_name">得分：</string>
+    <string name="led_text_view_hint">8888888</string>
+    <string name="level_name">级别：</string>
+    <string name="led_text_view_level_hint">8</string>
+    <string name="max_score_name">最高分：</string>
+    <string name="next_piece_name">下一个：</string>
+    <string name="game_over_view_title">俄罗斯方块</string>
+    <string name="pause">暂停(P)</string>
+    <string name="level">排名(L)</string>
+    <string name="restart">重玩(R)</string>
+    <string name="space">掉落(SPACE)</string>
+    <string name="rotate">旋转(W)</string>
+    <string name="left">左移(A)</string>
+    <string name="right">右移(D)</string>
+    <string name="down">下移(S)</string>
 </resources>

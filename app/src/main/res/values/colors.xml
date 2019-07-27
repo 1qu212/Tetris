@@ -11,4 +11,5 @@
     <color name="colorGreen">#2BBE1F</color>
     <color name="colorBlue">#5B64EE</color>
     <color name="colorRed">#D51818</color>
+    <color name="colorDefaultDevider">#16843284</color>
 </resources>

@@ -34,7 +34,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="得分："
+                    android:text="@string/score_name"
                     android:textColor="@color/colorBlack" />
 
                 <RelativeLayout
@@ -48,7 +48,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:gravity="right"
-                        android:hint="8888888"
+                        android:hint="@string/led_text_view_hint"
                         android:textColor="@color/colorBlack"
                         android:textColorHint="@color/colorGray"
                         android:textSize="18sp" />
@@ -66,7 +66,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="级别："
+                    android:text="@string/level_name"
                     android:textColor="@color/colorBlack" />
 
                 <RelativeLayout
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:gravity="right"
-                        android:hint="8"
+                        android:hint="@string/led_text_view_level_hint"
                         android:textColor="@color/colorBlack"
                         android:textColorHint="@color/colorGray"
                         android:textSize="18sp" />
@@ -98,7 +98,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="最高分："
+                    android:text="@string/max_score_name"
+                    android:textColor="@color/colorBlack" />
+
+                <TextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:textColor="@color/colorBlack" />
 
                 <RelativeLayout
@@ -112,7 +119,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:gravity="right"
-                        android:hint="8888888"
+                        android:hint="@string/led_text_view_hint"
                         android:textColor="@color/colorBlack"
                         android:textColorHint="@color/colorGray"
                         android:textSize="18sp" />
@@ -130,7 +137,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="下一个："
+                    android:text="@string/next_piece_name"
                     android:textColor="@color/colorBlack" />
 
                 <GridView
@@ -161,7 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
-                android:text="俄罗斯方块"
+                android:text="@string/game_over_view_title"
                 android:textColor="@color/colorBlack"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -202,7 +209,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="暂停(P)"
+                        android:text="@string/pause"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -224,7 +231,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="排名(L)"
+                        android:text="@string/level"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -246,7 +253,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="重玩(R)"
+                        android:text="@string/restart"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -269,7 +276,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="掉落(SPACE)"
+                    android:text="@string/space"
                     android:textColor="@color/colorBlack" />
             </LinearLayout>
         </LinearLayout>
@@ -298,7 +305,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="旋转(W)"
+                    android:text="@string/rotate"
                     android:textColor="@color/colorBlack"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -321,7 +328,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="左移(A)"
+                    android:text="@string/left"
                     android:textColor="@color/colorBlack"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -345,7 +352,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="右移(D)"
+                    android:text="@string/right"
                     android:textColor="@color/colorBlack"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -369,7 +376,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="下移(S)"
+                    android:text="@string/down"
                     android:textColor="@color/colorBlack"
                     android:textSize="10sp" />
             </LinearLayout>

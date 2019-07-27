@@ -1,16 +1,19 @@
 package cn.xydzjnq.tetris;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -22,6 +25,7 @@ import java.util.TimerTask;
 
 import cn.xydzjnq.tetris.bean.RecordListBean;
 import cn.xydzjnq.tetris.bean.StateBean;
+import cn.xydzjnq.tetris.dialog.NewRecordDialog;
 import cn.xydzjnq.tetris.piece.Piece;
 import cn.xydzjnq.tetris.piece.PieceFatory;
 import cn.xydzjnq.tetris.util.ConfigSPUtils;
@@ -32,7 +36,7 @@ import cn.xydzjnq.tetris.view.LedTextView;
 import static cn.xydzjnq.tetris.util.ConfigSPUtils.RECORDLIST;
 import static cn.xydzjnq.tetris.util.StateSPUtils.STATEBEAN;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private static String TAG = "MainActivity";
     private GridView gvBlockBoard;
     private LedTextView tvScore;
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Piece currentPiece;
     private GameOverView govAnim;
     private LinearLayout llAnim;
+    private TextView tvUserName;
     //方块片左下角在整个界面的行和列
     private int row;
     private int culumn;
@@ -321,7 +326,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         downTimer = new Timer();
                         downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
                         btnSpace.setEnabled(true);
-                        btnRecordList.setEnabled(true);
                         btnUp.setEnabled(true);
                         btnLeft.setEnabled(true);
                         btnRight.setEnabled(true);
@@ -329,9 +333,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         cancelSpaceTimer();
                         cancelDownTimer();
-                        downTimer = null;
                         btnSpace.setEnabled(false);
-                        btnRecordList.setEnabled(false);
                         btnUp.setEnabled(false);
                         btnLeft.setEnabled(false);
                         btnRight.setEnabled(false);
@@ -340,7 +342,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case PAUSE:
                     btnSpace.setEnabled(false);
-                    btnRecordList.setEnabled(false);
                     btnUp.setEnabled(false);
                     btnLeft.setEnabled(false);
                     btnRight.setEnabled(false);
@@ -348,7 +349,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case RESUME:
                     btnSpace.setEnabled(true);
-                    btnRecordList.setEnabled(true);
                     btnUp.setEnabled(true);
                     btnLeft.setEnabled(true);
                     btnRight.setEnabled(true);
@@ -396,31 +396,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Gson gson = new Gson();
                         RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
                         List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
-                        int size = recordBeanList.size();
-                        RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
+                        RecordListBean.RecordBean recordBean = recordBeanList.get(0);
                         int lastScore = Integer.parseInt(recordBean.getScore());
                         if (score >= lastScore) {
-                            RecordListBean listBean = new RecordListBean();
-                            List<RecordListBean.RecordBean> beanList = new ArrayList<>(recordBeanList);
-                            RecordListBean.RecordBean bean = new RecordListBean.RecordBean();
-                            bean.setName("匿名");
-                            bean.setScore(String.valueOf(score));
-                            bean.setTime(String.valueOf(System.currentTimeMillis()));
-                            beanList.add(bean);
-                            listBean.setRecordBeanList(beanList);
-                            ConfigSPUtils.putString(getApplication(), RECORDLIST, new Gson().toJson(listBean));
+                            showNewRecordDialog(recordBeanList);
                         }
                     } else {
                         if (score > 0) {
-                            RecordListBean recordListBean = new RecordListBean();
-                            RecordListBean.RecordBean recordBean = new RecordListBean.RecordBean();
-                            recordBean.setName("匿名");
-                            recordBean.setScore(String.valueOf(score));
-                            recordBean.setTime(String.valueOf(System.currentTimeMillis()));
-                            List<RecordListBean.RecordBean> recordBeanList = new ArrayList<>();
-                            recordBeanList.add(recordBean);
-                            recordListBean.setRecordBeanList(recordBeanList);
-                            ConfigSPUtils.putString(getApplication(), RECORDLIST, new Gson().toJson(recordListBean));
+                            showNewRecordDialog(null);
                         }
                     }
                     break;
@@ -430,6 +413,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     };
+
+    private void showNewRecordDialog(@Nullable final List<RecordListBean.RecordBean> recordBeanList) {
+        NewRecordDialog.Builder builder = new NewRecordDialog.Builder(MainActivity.this, true, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                NewRecordDialog newRecordDialog = (NewRecordDialog) dialog;
+                RecordListBean listBean = new RecordListBean();
+                List<RecordListBean.RecordBean> beanList = new ArrayList<>();
+                if (recordBeanList != null) {
+                    beanList.addAll(recordBeanList);
+                }
+                RecordListBean.RecordBean bean = new RecordListBean.RecordBean();
+                if (TextUtils.isEmpty(newRecordDialog.getUserName())) {
+                    bean.setName(newRecordDialog.getUserNameHint());
+                } else {
+                    bean.setName(newRecordDialog.getUserName());
+                }
+                bean.setScore(String.valueOf(score));
+                bean.setTime(String.valueOf(System.currentTimeMillis()));
+                beanList.add(0, bean);
+                listBean.setRecordBeanList(beanList);
+                ConfigSPUtils.putString(getApplication(), RECORDLIST, new Gson().toJson(listBean));
+            }
+        }).setUserNameHint(R.string.user_name_hint).setScoreValue(String.valueOf(score));
+        builder.builder().show();
+    }
 
     private void initView() {
         gvBlockBoard = (GridView) findViewById(R.id.gv_block_board);
@@ -455,6 +464,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDown.setOnClickListener(this);
         govAnim = (GameOverView) findViewById(R.id.gov_anim);
         llAnim = (LinearLayout) findViewById(R.id.ll_anim);
+        tvUserName = (TextView) findViewById(R.id.tv_user_name);
     }
 
     private void initData() {
@@ -466,8 +476,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Gson gson = new Gson();
             RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
             List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
-            int size = recordBeanList.size();
-            RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
+            RecordListBean.RecordBean recordBean = recordBeanList.get(0);
+            tvUserName.setText(recordBean.getName());
             Integer lastScore = Integer.parseInt(recordBean.getScore());
             tvMaxScore.setText(String.valueOf(lastScore));
         }
@@ -532,8 +542,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Gson gson = new Gson();
             RecordListBean recordListBean = gson.fromJson(recordList, RecordListBean.class);
             List<RecordListBean.RecordBean> recordBeanList = recordListBean.getRecordBeanList();
-            int size = recordBeanList.size();
-            RecordListBean.RecordBean recordBean = recordBeanList.get(size - 1);
+            RecordListBean.RecordBean recordBean = recordBeanList.get(0);
+            tvUserName.setText(recordBean.getName());
             Integer lastScore = Integer.parseInt(recordBean.getScore());
             tvMaxScore.setText(String.valueOf(lastScore));
         }
@@ -582,6 +592,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.btn_record_list:
+                if (isStart) {
+                    Intent intent = new Intent(this, RecordListActivity.class);
+                    startActivity(intent);
+                }
                 break;
             case R.id.btn_restart:
                 if (isStart) {
@@ -615,6 +629,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handler.sendEmptyMessage(DOWN);
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cancelSpaceTimer();
+        cancelDownTimer();
+        downTimer = new Timer();
+        downTimer.schedule(getTimerTask(), timeInterval, timeInterval);
+        uiHandler.sendEmptyMessage(RESUME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cancelSpaceTimer();
+        cancelDownTimer();
+        uiHandler.sendEmptyMessage(PAUSE);
     }
 
     @Override

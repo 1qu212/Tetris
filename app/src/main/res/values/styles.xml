@@ -9,4 +9,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="ActivityDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>
