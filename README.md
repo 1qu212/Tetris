@@ -1,5 +1,3 @@
-@[TOC](经典俄罗斯方块Android版)
-
 # 缘起
 在GitHub上看到[react-tetris](https://github.com/chvin/react-tetris)版本的俄罗斯方块，长这样的：![tetris](./app/screenshot/tetris_01.gif)
 
