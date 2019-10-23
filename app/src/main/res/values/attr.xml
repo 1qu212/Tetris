@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ShadowView">
+        <attr name="radiusOffset" format="float" />
+        <attr name="shadowWidth" format="dimension" />
+        <attr name="saturation" format="float" />
+    </declare-styleable>
+</resources>

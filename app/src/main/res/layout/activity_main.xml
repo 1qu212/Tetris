@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -199,12 +200,13 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <Button
+                    <cn.xydzjnq.tetris.view.ShadowImageView
                         android:id="@+id/btn_pause"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="@drawable/selector_botton_green"
-                        android:elevation="10dp" />
+                        android:background="@drawable/shape_oval_green"
+                        android:clickable="true"
+                        app:radiusOffset="0.6" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -221,12 +223,13 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <Button
+                    <cn.xydzjnq.tetris.view.ShadowImageView
                         android:id="@+id/btn_record_list"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="@drawable/selector_botton_green"
-                        android:elevation="10dp" />
+                        android:background="@drawable/shape_oval_green"
+                        android:clickable="true"
+                        app:radiusOffset="0.6" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -243,12 +246,13 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <Button
+                    <cn.xydzjnq.tetris.view.ShadowImageView
                         android:id="@+id/btn_restart"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:background="@drawable/selector_botton_red"
-                        android:elevation="10dp" />
+                        android:background="@drawable/shape_oval_red"
+                        android:clickable="true"
+                        app:radiusOffset="0.6" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -266,12 +270,13 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
-                <Button
+                <cn.xydzjnq.tetris.view.ShadowImageView
                     android:id="@+id/btn_space"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:background="@drawable/selector_botton_blue"
-                    android:elevation="10dp" />
+                    android:background="@drawable/shape_oval_blue"
+                    android:clickable="true"
+                    app:radiusOffset="0.6" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -294,12 +299,13 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
-                <Button
+                <cn.xydzjnq.tetris.view.ShadowImageView
                     android:id="@+id/btn_up"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:background="@drawable/selector_botton_blue"
-                    android:elevation="10dp" />
+                    android:background="@drawable/shape_oval_blue"
+                    android:clickable="true"
+                    app:radiusOffset="0.6" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -317,12 +323,13 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <Button
+                <cn.xydzjnq.tetris.view.ShadowImageView
                     android:id="@+id/btn_left"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:background="@drawable/selector_botton_blue"
-                    android:elevation="10dp" />
+                    android:background="@drawable/shape_oval_blue"
+                    android:clickable="true"
+                    app:radiusOffset="0.6" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -341,12 +348,13 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <Button
+                <cn.xydzjnq.tetris.view.ShadowImageView
                     android:id="@+id/btn_right"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:background="@drawable/selector_botton_blue"
-                    android:elevation="10dp" />
+                    android:background="@drawable/shape_oval_blue"
+                    android:clickable="true"
+                    app:radiusOffset="0.6" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -365,12 +373,13 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
-                <Button
+                <cn.xydzjnq.tetris.view.ShadowImageView
                     android:id="@+id/btn_down"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
-                    android:background="@drawable/selector_botton_blue"
-                    android:elevation="10dp" />
+                    android:background="@drawable/shape_oval_blue"
+                    android:clickable="true"
+                    app:radiusOffset="0.6" />
 
                 <TextView
                     android:layout_width="match_parent"
